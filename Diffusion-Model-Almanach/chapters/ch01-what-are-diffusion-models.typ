@@ -1,10 +1,21 @@
 #import "../shared/styles.typ": *
 
+= The Age of Diffusion Models
+
+First mass-adopted public checkpoint that changed everything was Stable Diffusion 1.5, released in late 2022. It was open-source, free to use, and capable of generating high-quality images from text prompts. This democratized access to powerful image generation technology, leading to an explosion of creativity and innovation in the field.
+
+
+
 = What Are Diffusion Models?
 
 Imagine taking a photograph and slowly adding static noise to it — like turning up the snow on an old TV — until the image is nothing but random grain. Now imagine *reversing* that process: starting from pure noise and gradually removing it until a coherent image appears.
 
 That is the core idea behind diffusion models.
+
+#figure(
+  image("../images/ch-1/Diffusion-Process2.png", width: 100%),
+  caption: [The denoising process in action: starting from pure noise (step 1), the model iteratively refines the image until a coherent result emerges (step 40).],
+)
 
 A diffusion model is a type of AI that has learned to *denoise* — to take random noise and shape it, step by step, into an image that matches a text description you give it. Type "a castle on a cliff at sunset" and the model sculpts that scene out of static.
 
