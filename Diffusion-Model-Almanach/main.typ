@@ -12,6 +12,9 @@
 // Table of Contents
 #outline(title: "Contents", indent: 1.5em, depth: 2)
 
+// Preface (unnumbered)
+#include "chapters/00-preface.typ"
+
 // Chapters
 #include "chapters/ch01-what-are-diffusion-models.typ"
 #include "chapters/ch02-building-blocks.typ"
