@@ -6,6 +6,10 @@ This guide is for anyone who wants to know more about diffusion models. The land
 
 It's not a prompt guide or what software to use. I have got many other tutorial for that on my youtube or patreon. This is a high-level overview of what the different models are, and how they compare.
 
+The goal is to give you a solid understanding of the different base models, so you can make informed choices about which ones to use, and how to use them effectively.
+
+The vocabulary is kept simple on purpose. I want this to be accessible to everyone, regardless of technical background. If you want to dive deeper into the technical details, there are plenty of resources available.
+
 #figure(
   image("../images/ch-1/civitai-overview.png", width: 100%),
   caption: [Overview of the CivitAI platform, showcasing the variety of models available.],
@@ -30,7 +34,7 @@ A diffusion model is a type of AI that has learned to *denoise* — to take rand
 
 This technology has made image generation accessible to everyone. You don't need to be an artist. You don't need expensive software. You need a model, a text prompt, and a decent computer — sometimes just your phone if you are using a cloud-based service.
 
-Platforms like *CivitAI* or *huggingface* host thousands of these models, each fine-tuned for different styles, subjects, and purposes. Some excel at photorealism. Others produce anime. Some can edit existing images from a simple instruction like "make her hair red."
+Platforms like *CivitAI* or *Hugging Face* host thousands of these models, each fine-tuned for different styles, subjects, and purposes. Some excel at photorealism. Others produce anime. Some can edit existing images from a simple instruction like "make her hair red."
 
 The landscape is vast, and it moves fast. New models appear weekly. This almanac is your map.
 
