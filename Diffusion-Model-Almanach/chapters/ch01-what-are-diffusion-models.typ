@@ -77,6 +77,13 @@ Every diffusion model follows roughly the same process:
 
 #v(1em)
 
+To see this in practice, here is what the same flow looks like with a real example:
+
+#figure(
+  image("../images/ch-1/clipTextEncode.png", width: 90%),
+  caption: [A concrete example of the pipeline: the prompt "A cute cat wearing a top hat" is encoded into a semantic embedding (a vector of numbers), which the diffusion model then uses to guide denoising from pure noise into the final image.],
+)
+
 Different model families (SD 1.5, SDXL, Flux, etc.) each implement this pipeline differently — with different architectures, different text encoders, and different capabilities. We'll cover each of them in detail.
 
 #info-box(title: "Key Takeaway")[
