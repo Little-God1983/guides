@@ -110,6 +110,11 @@ You always start with a checkpoint. Then you optionally layer LoRAs, swap the VA
 
 The VAE is the component that *translates between the model's internal world and the pixels on your screen*. This matters because diffusion models don't actually work with pixels — they work in a compressed mathematical space called *latent space*. The VAE is the bridge between those two worlds.
 
+#figure(
+  image("../images/ch-2/VAE.png", width: 100%),
+  caption: [A VAE compresses data (image, audio, or video) into a compact *latent* representation and decompresses it back again. Diffusion models work entirely in that latent space — the VAE is what lets them turn their output into something you can actually see.],
+)
+
 It plays two roles in the pipeline:
 
 - *Decoding* — when the model has finished denoising, the VAE decompresses the final latent representation back into a real image you can view. This is the step every single generation goes through.
@@ -124,17 +129,50 @@ Because the VAE is the last thing that touches your image before you see it, it 
 Most modern checkpoints — SDXL, Flux, ZImage, Qwen, etc. — ship with a well-tuned VAE baked in, and you won't need to think about it at all. Where VAE swapping still matters is the *older SD 1.5 ecosystem*: many community checkpoints from that era have inherited broken or low-quality VAEs, and dropping in a dedicated VAE file (the classic one is `vae-ft-mse-840000`) is a one-click fix for washed-out colors and mushy details.
 
 #tip-box(title: "Do I need to worry about VAE?")[
-  For almost every modern model: *no*. Pick a checkpoint and generate. If you are using an older SD 1.5 checkpoint and your outputs look dull, desaturated, or blurry — *then* it's worth downloading a replacement VAE and pointing your UI at it.
+  For almost every modern model: *no*. Pick a checkpoint use the default VAE and generate. If you are using an older SD 1.5 checkpoint and your outputs look dull, desaturated, or blurry — *then* it's worth downloading a replacement VAE and pointing your UI at it.
 ]
 
 === Embeddings / Textual Inversions
 
-These are tiny files (a few KB) that teach the model a new keyword. For example, an embedding might let you type `ugly_hands` in your negative prompt to specifically avoid deformed hands. They are simple, lightweight, and stack easily.
+An embedding is a *new word* taught to the model. Not a new concept, not a new ability — just a new word that *points to* a combination of things the model already knows how to draw.
+
+Under the hood, an embedding is a small vector of numbers (typically a few KB in size) that lives alongside the model's existing vocabulary. When you use the embedding's trigger word in your prompt, the model interprets it as that learned vector instead of looking it up in its normal dictionary. That vector acts as a shortcut to a specific concept, style, or set of visual traits.
+
+This is fundamentally different from a LoRA:
+
+- *A LoRA* modifies the model's *generation network* — it actually changes how the model draws things.
+- *An embedding* only modifies the model's *vocabulary* — it gives you a new keyword, but the drawing itself is still done by the unchanged model.
+
+That difference explains both the strengths and the limits of embeddings:
+
+- *Tiny* — a few KB compared to 10–200 MB for a LoRA.
+- *Stack cleanly* — you can use many in the same prompt without them fighting each other.
+- *Limited reach* — they can only compose from things the model already knows. They cannot teach the model a genuinely new concept or style the way a LoRA can.
+
+The most common use today is *quality negative embeddings*. Files like `EasyNegative`, `BadHands`, or `bad-artist` bundle up dozens of "bad output" concepts into a single keyword you drop into your negative prompt — saving you from typing out long negative prompts every time.
+
+#warning-box(title: "Embeddings are tied to the text encoder")[
+  An embedding trained on SD 1.5 will not work on SDXL, Flux, or any other family — they have different text encoders, so the vectors don't mean the same thing. As with LoRAs: check the base model family before downloading.
+]
+
+#tip-box(title: "When to reach for an embedding")[
+  Embeddings have largely been overtaken by LoRAs for *adding* things (styles, characters, concepts). But for *negative prompts* — packing a bunch of quality filters into one keyword — a good negative embedding is still hard to beat. Start with `EasyNegative` on SD 1.5 and see the difference immediately.
+]
 
 === Hypernetworks
 
-An older technique for model modification, mostly replaced by LoRAs. You may still find them on CivitAI but they are rarely used with modern model families.
+A hypernetwork is the *ancestor of the LoRA*. Before LoRAs became the standard in early 2023, hypernetworks were the main way to fine-tune a Stable Diffusion model's style or subject without retraining the entire checkpoint.
 
-#warning-box(title: "Dying out")[
-  While Hypernetworks and Texutal Inversions were a thing when all began. Hypernetworks arent used anymore in SDXL and later models and Texutal Inversion is also more a thing of the past.
+Technically, a hypernetwork is a small extra neural network that inserts itself into the main model's attention layers and nudges the output in a specific direction. It solves the same problem as a LoRA — *modify the model's behavior cheaply* — but using a different mathematical approach.
+
+LoRAs won out for three practical reasons:
+
+- *Easier to train* — LoRAs require fewer training tricks and less GPU memory to produce a good result.
+- *Better quality* — LoRAs capture fine detail and style more faithfully than hypernetworks did.
+- *Better composability* — stacking multiple LoRAs works more cleanly than stacking multiple hypernetworks, which often fought with each other.
+
+The result: the community moved on. Almost every new SDXL, Pony, Illustrious, Flux, or Qwen fine-tune released today is a LoRA, not a hypernetwork. CivitAI still hosts thousands of hypernetworks in its archive — but almost all of them are for SD 1.5, and most are now superseded by better LoRA versions of the same concept.
+
+#info-box(title: "Do I need to care about hypernetworks?")[
+  In 2026: *almost certainly not*. If you come across a hypernetwork on CivitAI, check whether there is a LoRA version of the same style or character — there usually is, and it will work better. Hypernetworks are worth knowing about mainly so you recognize the category when you see it, not because you'll be using them.
 ]
