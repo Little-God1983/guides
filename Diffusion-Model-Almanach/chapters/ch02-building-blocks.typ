@@ -61,6 +61,74 @@ Here is the key insight: *every community checkpoint is built on a base model*. 
   A LoRA trained on SDXL will work with *any* SDXL community checkpoint — Juggernaut, RealVis, DreamShaper XL, whatever. They all share the same underlying architecture. But that same LoRA will break on an SD 1.5 or Flux checkpoint, even though all three are "checkpoints". Always check the *base model family* — not the checkpoint name.
 ]
 
+#pagebreak()
+=== Uncensored Is Not the Same as Untrained
+#figure(
+  image("../images/ch-2/censored.jpg", width: 90%),
+  caption: [A Common Misunderstanding],
+)
+
+A common complaint I get on my videos goes like this:
+
+#figure(
+  image("../images/ch-2/clickbait.png", width: 90%),
+  caption: [The kind of comment that inspired this section.],
+)
+
+This is a misunderstanding of what "uncensored" actually means. Two very different things are getting mixed up:
+
+#figure(
+  table(
+    columns: (1fr, 1fr),
+    inset: 10pt,
+    align: (left, left),
+    fill: (_, row) => if row == 0 { rgb("#0f3460") } else if calc.odd(row) { rgb("#f5f5f5") } else { white },
+    text(fill: white, weight: "bold")[Uncensored],
+    text(fill: white, weight: "bold")[Trained on a Subject],
+
+    [The weights are open. There is no safety filter blocking outputs. Nothing refuses your prompt.],
+    [The model was actually *shown* images of that subject during training, so it knows what it looks like.],
+
+    [A property of *how the model is distributed*.],
+    [A property of *what the model has learned*.],
+
+    [Removing a filter is a one-line change.],
+    [Teaching a concept requires retraining on thousands of images.],
+  ),
+  caption: [Uncensored means nothing is stopping you. Trained means the model actually knows how.],
+)
+
+The base *SDXL* is a clean example. The weights are open, there is no inference-time classifier, nothing refuses your prompt. You can type whatever you want. But Stability AI deliberately filtered NSFW content out of the SDXL training dataset, so the model *never saw* what it's being asked to draw. Ask SDXL base for anything nude and you get deformed, anatomically-wrong results — not because something is blocking you, but because the model genuinely doesn't know. This is exactly why the entire SDXL NSFW community moved to fine-tunes like *Pony*, *Illustrious*, and *Noob AI* — they take the open SDXL architecture and teach it what it was never shown.
+
+=== Degrees of Censorship
+
+Not every base model is equally "empty" when it comes to filtered content. There is a spectrum:
+
+#figure(
+  table(
+    columns: (auto, 1fr, 1fr),
+    inset: 10pt,
+    align: (left, left, left),
+    fill: (_, row) => if row == 0 { rgb("#0f3460") } else if calc.odd(row) { rgb("#f5f5f5") } else { white },
+    text(fill: white, weight: "bold")[Level],
+    text(fill: white, weight: "bold")[What's happening],
+    text(fill: white, weight: "bold")[Example],
+
+    [*Lightly filtered*], [Training data was cleaned of explicit content but the model still recognizes bodies, poses, anatomy. Fine-tunes can fill in the gaps easily.], [SD 1.5 (base), SDXL (base)],
+    [*Heavily filtered*], [Training data was aggressively filtered *and* the model was guided during training to avoid certain concepts. Fine-tuning still works but requires much more data and skill.], [FLUX Dev],
+    [*Refuses at inference*], [The model itself is trained to produce unusable output when it detects a filtered concept — sometimes reinforced by a separate safety classifier.], [Most closed-source APIs; some open models ship with optional safety checkers you can turn off],
+  ),
+  caption: [The same "uncensored" label can mean very different things in practice.],
+)
+
+FLUX Dev sits firmly in the heavily-filtered middle tier. Its weights are open and no classifier is blocking you, but Black Forest Labs didn't just filter the dataset — they actively steered the model away from NSFW during training. That makes Flux NSFW fine-tunes much harder to produce than SDXL ones, and it's why the Flux NSFW ecosystem lags behind Pony or Illustrious.
+
+Fine-tunes fix this problem with varying degrees of difficulty. A lightly-filtered base is easy to un-filter. A heavily-filtered one takes serious work. But in *all* cases, the underlying point holds: the problem is what the model *knows*, not whether the weights are locked.
+
+#info-box(title: "The short version")[
+  *Uncensored* = nothing is blocking the output. *Trained* = the model knows how to make it. A base model can be fully uncensored in the open-source sense and still produce terrible NSFW because it was trained to avoid it. That is exactly why NSFW-focused community checkpoints exist — and why some base models are much easier to fine-tune than others.
+]
+
 === File Formats
 
 Checkpoints come in two formats you'll encounter:
